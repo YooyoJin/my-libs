@@ -36,10 +36,10 @@
     .s16PidKi = 1,                                      \
     .s16PidKd = 1,                                      \
                                                         \
-    /* 反馈测速 (512us 滴答, 12 脉冲/转, 每转测一次) */     \
+    /* 反馈测速 (512us 滴答, 12 脉冲/转=24 边沿/转, 每转测一次) */  \
     .u16TickUs      = 512u,                             \
     .u8PulsePerRev  = 12u,                              \
-    .u8PulseDivide  = 12u,                              \
+    .u8PulseDivide  = 24u,                              \
     .u8PidDivide    = 1u,                               \
                                                         \
     /* 转速限幅 (RPM) */                                   \

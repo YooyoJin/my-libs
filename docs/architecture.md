@@ -11,9 +11,9 @@
               │                                                     │
    APP 层     │  main.c(组装根)   comm485.c   业务任务.c              │ ← examples / 产品工程
               ├─────────────────────────────────────────────────────┤
-   模块层     │  fanctrl/   pidcore/   filters/   ringbuf/  ...      │ ← 本仓库 modules/
+   模块层     │  fanctrl/   pidcore/   filters/   ringbuf/  ...      │ ← 本仓库 source/modules/
               ├─────────────────────────────────────────────────────┤
-   BSP 层     │  uart485.c   pwmout.c   gpioisr.c                    │ ← 本仓库 port/<芯片>/
+   BSP 层     │  uart485.c   pwmout.c   gpioisr.c                    │ ← 本仓库 source/port/<芯片>/
               └─────────────────────────────────────────────────────┘
                                   ↑ 分层（纵向：依赖只准向下）
 ```
@@ -22,7 +22,7 @@
 - 模块层 = 机制，说抽象语言（对上提供 API 如 RPM，对下只认钩子如 FanPort）
 - BSP 层 = port/，唯一允许出现寄存器名的地方
 
-**APP 层健康判据**：业务代码里 grep 不到任何芯片寄存器名；模块层健康判据：modules/ 里 grep 不到任何芯片寄存器名。
+**APP 层健康判据**：业务代码里 grep 不到任何芯片寄存器名；模块层健康判据：source/modules/ 里 grep 不到任何芯片寄存器名。构建系统（CMake/MDK）只存在于 examples/gcc 与 examples/mdk。
 
 ## 2. 机制 vs 业务：准入三问
 

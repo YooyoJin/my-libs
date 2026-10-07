@@ -72,7 +72,7 @@ typedef struct
     /* ---- 反馈测速 ---- */
     uint16_t u16TickUs;        /* FanCtrlTickFast 调用周期, us      默认  512 */
     uint8_t  u8PulsePerRev;    /* 每转反馈脉冲数                    默认   12 */
-    uint8_t  u8PulseDivide;    /* 每多少个脉冲计一次转速            默认   12 */
+    uint8_t  u8PulseDivide;    /* 每多少个电平边沿计一次转速(=每转脉冲数x2) 默认24 */
     uint8_t  u8PidDivide;      /* 每多少次测速执行一次 PID          默认    1 */
 
     /* ---- 转速限幅 ---- */

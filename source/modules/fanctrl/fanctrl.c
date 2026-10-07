@@ -40,6 +40,11 @@ static uint16_t FanOutToDutyPm(uint16_t u16Out)
 /* 把当前输出写出至硬件钩子 */
 static void FanWriteOutput(FanCtrl *pstFan)
 {
+    if (0u == pstFan->u16Output)
+    {
+        pstFan->pstPort->FanWriteDuty(0u); /* 0 = 关闭输出, 不走换算(对应原工程 Output<=1 特判) */
+        return;
+    }
     pstFan->pstPort->FanWriteDuty(FanOutToDutyPm(pstFan->u16Output));
 }
 
