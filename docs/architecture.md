@@ -22,7 +22,7 @@
 - 模块层 = 机制，说抽象语言（对上提供 API 如 RPM，对下只认钩子如 FanPort）
 - BSP 层 = port/，唯一允许出现寄存器名的地方
 
-**APP 层健康判据**：业务代码里 grep 不到任何芯片寄存器名；模块层健康判据：source/modules/ 里 grep 不到任何芯片寄存器名。构建系统（CMake/MDK）只存在于 examples/gcc 与 examples/mdk。
+**APP 层健康判据**：业务代码里 grep 不到任何芯片寄存器名；模块层健康判据：source/modules/ 里 grep 不到任何芯片寄存器名。构建系统（CMake/MDK）只存在于 projects/gcc 与 projects/mdk。
 
 ## 2. 机制 vs 业务：准入三问
 

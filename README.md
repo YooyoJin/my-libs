@@ -7,9 +7,9 @@
 ## 分层模型
 
 ```
-        APP（产品工程 / examples的main.c：组装根 + 业务）
+        APP（产品工程 / source/app：组装根 + 业务）
           ↓ 只调API（说抽象语言，如RPM）
-   ┌── modules/ ──────────────────────┐
+   ┌── source/modules/ ───────────────┐
    │  fanctrl  pidcore  filters  ...   │  ← 本仓库：可复用机制层
    └──────────────┬───────────────────┘
                   ↓ 只调钩子（FanPort之类的回调）
@@ -41,8 +41,9 @@
 | `source/modules/<name>/` | 纯 `.c/.h/.md`，模块自足 | IDE工程文件、芯片头文件、横向include、业务逻辑 |
 | `source/common/` | ≥3个模块共享的极稳定类型（准入从严） | 当杂物间 |
 | `source/port/<芯片>/` | 寄存器操作、钩子实现 | 算法、业务 |
-| `examples/gcc/` | CMake构建根 + PC仿真（唯一构建入口，无根级CMakeLists） | 出现芯片寄存器名 |
-| `examples/mdk/` | MDK工程（唯一允许IDE工程的地方） | 被source/ 反向依赖 |
+| `source/app/` | 应用层：组装根+演示业务（耦合合法区） | 业务代码出现寄存器名 |
+| `projects/gcc/` | CMake构建文件+build产物 | 出现应用源码 |
+| `projects/mdk/` | MDK工程文件（唯一允许IDE工程的地方） | 出现应用源码 |
 | `docs/` | 规范与决策记录 | 与单模块绑死的文档 |
 | `tools/` | 脚本工具 | — |
 
@@ -91,9 +92,9 @@ FanCtrlStart(&kstFan1);
 ## 构建（PC仿真验证）
 
 ```powershell
-cmake -S examples/gcc -B build -G "MinGW Makefiles"
-cmake --build build
-.\build\pcdemo\fanctrldemo.exe
+cmake -S projects/gcc -B projects/gcc/build -G "MinGW Makefiles"
+cmake --build projects/gcc/build
+.\projects\gcc\build\fanctrldemo.exe
 ```
 
 ## 版本约定
