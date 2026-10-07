@@ -1,4 +1,6 @@
 {
     "files.encoding": "utf8",
-    "cmake.sourceDirectory": "E:/MyWorkspace/Project/other/blog/my-libs/examples/gcc"
+    "cmake.sourceDirectory": "${workspaceFolder}/projects/gcc",
+    "cmake.buildDirectory": "${workspaceFolder}/projects/gcc/build",
+    "cmake.generator": "MinGW Makefiles"
 }

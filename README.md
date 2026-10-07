@@ -42,7 +42,8 @@
 | `source/common/` | ≥3个模块共享的极稳定类型（准入从严） | 当杂物间 |
 | `source/port/<芯片>/` | 寄存器操作、钩子实现 | 算法、业务 |
 | `source/app/` | 应用层：组装根+演示业务（耦合合法区） | 业务代码出现寄存器名 |
-| `projects/gcc/` | CMake构建文件+build产物 | 出现应用源码 |
+| `projects/gcc/` | PC仿真构建(mingw, 产物fanctrldemo.exe) | 出现应用源码 |
+| `projects/armgcc/` | ARM交叉构建(arm-none-eabi, 产物libfanctrl.a) | 出现应用源码 |
 | `projects/mdk/` | MDK工程文件（唯一允许IDE工程的地方） | 出现应用源码 |
 | `docs/` | 规范与决策记录 | 与单模块绑死的文档 |
 | `tools/` | 脚本工具 | — |
@@ -89,13 +90,21 @@ FanCtrlStart(&kstFan1);
 /* 512us中断调FanCtrlTickFast(); 1s任务调FanCtrlTickSecond(); */
 ```
 
-## 构建（PC仿真验证）
+## 构建（各走各的: PC仿真/ARM交叉）
 
 ```powershell
+# PC仿真(mingw, 日常用)
 cmake -S projects/gcc -B projects/gcc/build -G "MinGW Makefiles"
 cmake --build projects/gcc/build
 .\projects\gcc\build\fanctrldemo.exe
+
+# ARM交叉(arm-none-eabi, 验证目标架构编译; TOOLCHAIN_FILE须绝对路径)
+cmake -S projects/armgcc -B projects/armgcc/build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=<仓库绝对路径>/projects/armgcc/toolchainarmgcc.cmake
+cmake --build projects/armgcc/build     # 产物 libfanctrl.a (armv7e-m)
 ```
+
+一键: `build.bat pc` / `build.bat arm` / `build.bat all` / `build.bat run`;
+VS Code: 任务`build-pc(仿真)`/`build-arm(交叉库)`(Terminal→Run Task)。
 
 ## 版本约定
 
