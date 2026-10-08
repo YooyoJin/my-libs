@@ -40,6 +40,7 @@
 
 - 只准上层依赖下层；**禁止横向 include、禁止反向、禁止成环**
 - 基础层（common/）不依赖任何人
+- **vendor/（第三方SDK/RTT）原样收，不修改一行**：不进登记依赖，不向其 include 业务头文件；被构建系统（projects/）挂接使用。修改需求一律不进vendor，用port层包一层
 - 所有依赖必须在头文件 `#include` 中显式可见，**禁止隐藏的全局变量勾连**
 - 模块间确需复用下层模块（如 fanctrl 用 pidcore）：允许，但必须在模块 readme 中声明 `依赖: pidcore>=v0.2`
 

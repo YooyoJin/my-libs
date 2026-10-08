@@ -24,6 +24,8 @@
 | 模块 | 功能 | 版本 | 状态 |
 |---|---|---|---|
 | [fanctrl](source/modules/fanctrl/readme.md) | PG/DC风机转速闭环（测速+增量PID+状态机+丢反馈三级保护） | v0.1.1 | ✅ 可用（仿真全场景验证通过） |
+| [crc](source/modules/crc/readme.md) | Modbus CRC16（查表/步进/位运算，三法互证0x4B37） | v0.1.0 | ✅ 可用 |
+| [log](source/modules/log/readme.md) | 分级日志（输出后端钩子化，RTT/UART可注入） | v0.1.0 | ✅ 可用 |
 | pidcore | 通用增量/位置式PID | — | 📋 规划（从fanctrl/CmpPID中长出） |
 | filters | 一阶滤波 / 滞回比较 / 斜率检测 | — | 📋 规划 |
 | ringbuf | 环形缓冲（串口收发） | — | 📋 规划 |
@@ -41,9 +43,10 @@
 | `source/modules/<name>/` | 纯 `.c/.h/.md`，模块自足 | IDE工程文件、芯片头文件、横向include、业务逻辑 |
 | `source/common/` | ≥3个模块共享的极稳定类型（准入从严） | 当杂物间 |
 | `source/port/<芯片>/` | 寄存器操作、钩子实现 | 算法、业务 |
+| `source/vendor/<名>/` | 第三方SDK/RTT（**原样收，不修改一行**） | 被修改（应重新从官方获取） |
 | `source/app/` | 应用层：组装根+演示业务（耦合合法区） | 业务代码出现寄存器名 |
 | `projects/gcc/` | PC仿真构建(mingw, 产物fanctrldemo.exe) | 出现应用源码 |
-| `projects/armgcc/` | ARM交叉构建(arm-none-eabi, 产物libfanctrl.a) | 出现应用源码 |
+| `projects/armgcc/` | ARM交叉**完整固件**构建（hex/bin/elf+模块.a，可直接烧录） | 出现应用源码 |
 | `projects/mdk/` | MDK工程文件（唯一允许IDE工程的地方） | 出现应用源码 |
 | `docs/` | 规范与决策记录 | 与单模块绑死的文档 |
 | `tools/` | 脚本工具 | — |
@@ -98,9 +101,10 @@ cmake -S projects/gcc -B projects/gcc/build -G "MinGW Makefiles"
 cmake --build projects/gcc/build
 .\projects\gcc\build\fanctrldemo.exe
 
-# ARM交叉(arm-none-eabi, 验证目标架构编译; TOOLCHAIN_FILE须绝对路径)
+# ARM交叉完整固件(arm-none-eabi, 产物hex/bin可直接烧录; TOOLCHAIN_FILE须绝对路径)
 cmake -S projects/armgcc -B projects/armgcc/build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=<仓库绝对路径>/projects/armgcc/toolchainarmgcc.cmake
-cmake --build projects/armgcc/build     # 产物 libfanctrl.a (armv7e-m)
+cmake --build projects/armgcc/build     # 产物: build/hc32f460demo.hex/.bin/.elf + firmware.map
+# 烧录: JFlash + projects/armgcc/HC32F460PETB.jflash
 ```
 
 一键: `build.bat pc` / `build.bat arm` / `build.bat all` / `build.bat run`;

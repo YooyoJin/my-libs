@@ -1,18 +1,18 @@
 # source/app/hc32f460demo/——HC32F460跑板应用(前后台)
 
-用途:真机验证各模块+作为新项目的起手模板。应用源码放这里,MDK工程文件放projects/mdk/hc32f460demo/。
+OTA Bootloader骨架, 移植自My-OTA工程app层。应用源码放这里, 构建工程在projects/armgcc(gcc)与projects/mdk(MDK)。
 
-## 规划内容(本目录)
+## 文件
 
-- main.c——APP组装根:Init全部+while(1){各任务Poll();}
-- comm485.c/.h——APP通信任务:帧业务(参数写入各模块)+应答
-- commdebug.c——串口打印RPM/Output观测任务
+| 文件 | 说明 |
+|---|---|
+| main.c | 组装根: 依次拉起RTT日志→时钟→SysTick→LED→时间片调度; JumpToApp(Bootloader跳APP核心)保留备用 |
+| apptimer.c/h | 时间片调度(1ms SysTick→10ms标志→1s任务表100槽分时); 第三次复用时抽成scheduler模块 |
 
-前后台铁律:中断只搬字节,主loop动脑子;485 DE脚在TX Complete中断里切换。
-业务允许耦合(组装根是耦合合法区),但业务代码里不准出现寄存器名。
+## 前后台铁律
 
-## 对拍验证流程(切换真实输出前必做)
+中断只置标志/计数, 主loop动脑子; 业务代码里不准出现寄存器名。
 
-1. 本应用与产品工程“影子运行”(只计算不输出,或输出到空闲定时器通道)
-2. 串口每秒打印GetRpm/GetOutput,与产品工程寄存器观测值对比
-3. 曲线一致后切换真实PWM输出,跑完整自检+启停50次
+## 验证现象(上板)
+
+RTT日志输出SystemCoreClock与心跳, LED周期闪烁。

@@ -63,8 +63,8 @@ typedef struct
     // ---- 输出量纲(反向刻度:数值越大→占空比越小→转速越低) ----
     uint16_t u16OutAtMaxRpm;   // 最高转速对应输出值,PID输出下限  默认1500
     uint16_t u16OutAtMinRpm;   // 最低转速对应输出值,PID输出上限  默认7000
-    uint16_t u16OutStartup;    // 启动保持期输出值                  默认6700
-    uint16_t u16OutSearchStep; // 丢反馈搜索时每步削减量            默认 500
+    uint16_t u16OutStartup;    // 启动保持期输出值  默认6700
+    uint16_t u16OutSearchStep; // 丢反馈搜索时每步削减量  默认 500
 
     // ---- 增量式PID系数 ----
     int16_t  s16PidKp;         // 默认5
@@ -72,22 +72,22 @@ typedef struct
     int16_t  s16PidKd;         // 默认1
 
     // ---- 反馈测速 ----
-    uint16_t u16TickUs;        // FanCtrlTickFast调用周期,us      默认 512
-    uint8_t  u8PulsePerRev;    // 每转反馈脉冲数                    默认  12
-    uint8_t  u8PulseDivide;    // 每多少个电平边沿计一次转速(=每转脉冲数x2) 默认24
-    uint8_t  u8PidDivide;      // 每多少次测速执行一次PID           默认   1
+    uint16_t u16TickUs;        // FanCtrlTickFast调用周期,us  默认512
+    uint8_t  u8PulsePerRev;    // 每转反馈脉冲数  默认12
+    uint8_t  u8PulseDivide;    // 每多少个电平边沿计一次转速(=每转脉冲数x2)  默认24
+    uint8_t  u8PidDivide;      // 每多少次测速执行一次PID  默认1
 
     // ---- 转速限幅 ----
-    uint16_t u16RpmMin;        // 目标转速下限(RPM)  默认 200
+    uint16_t u16RpmMin;        // 目标转速下限(RPM)  默认200
     uint16_t u16RpmMax;        // 目标转速上限(RPM)  默认1500
 
     // ---- 启动/保护时序(单位:秒,由FanCtrlTickSecond驱动) ----
-    uint8_t  u8StartupHoldSec;   // 启动保持时长   默认20
-    uint8_t  u8NoFeedJudgeSec;   // 判丢反馈时限   默认10
-    uint8_t  u8SearchStepSec;    // 搜索步进周期   默认 2
-    uint8_t  u8SearchTimeoutSec; // 单轮搜索超时   默认30
-    uint8_t  u8SearchRetryMax;   // 搜索轮数上限   默认 2
-    uint8_t  u8RetryStopSec;     // 轮间停转时长   默认 5
+    uint8_t  u8StartupHoldSec;   // 启动保持时长  默认20
+    uint8_t  u8NoFeedJudgeSec;   // 判丢反馈时限  默认10
+    uint8_t  u8SearchStepSec;    // 搜索步进周期  默认2
+    uint8_t  u8SearchTimeoutSec; // 单轮搜索超时  默认30
+    uint8_t  u8SearchRetryMax;   // 搜索轮数上限  默认2
+    uint8_t  u8RetryStopSec;     // 轮间停转时长  默认5
 } FanCfg;
 
 // ----------------------------------------------------------------------------
