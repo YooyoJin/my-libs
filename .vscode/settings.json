@@ -2,5 +2,17 @@
     "files.encoding": "utf8",
     "cmake.sourceDirectory": "${workspaceFolder}/projects/gcc",
     "cmake.buildDirectory": "${workspaceFolder}/projects/gcc/build",
-    "cmake.generator": "MinGW Makefiles"
+    "cmake.generator": "MinGW Makefiles",
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "files.associations": {
+        "fanctrl.h": "c",
+        "fancfg.h": "c",
+        "stdint.h": "c",
+        "stdbool.h": "c"
+    },
+    "search.exclude": {
+        "**/build*/**": true,
+        "**/Objects/**": true,
+        "**/Listings/**": true
+    }
 }

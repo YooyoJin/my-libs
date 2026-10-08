@@ -4,6 +4,9 @@ project(my-libs-projects C)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+# 导出compile_commands.json供VS Code IntelliSense使用(跳转/补全)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(SRC_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../source)
 
 # ============ 模块库登记处(每加一个模块在这里加一段) ============

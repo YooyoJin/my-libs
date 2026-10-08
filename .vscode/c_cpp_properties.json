@@ -1,0 +1,36 @@
+{
+    "version": 4,
+    "configurations": [
+        {
+            "name": "PC(mingw)",
+            "compilerPath": "E:/Program Files/mingw64/bin/gcc.exe",
+            "compileCommands": "${workspaceFolder}/projects/gcc/build/compile_commands.json",
+            "includePath": [
+                "${workspaceFolder}/source/modules/**",
+                "${workspaceFolder}/source/port/**",
+                "${workspaceFolder}/source/common/**",
+                "${workspaceFolder}/source/app/**"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/source"
+                ],
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "cStandard": "c99",
+            "intelliSenseMode": "gcc-x64"
+        },
+        {
+            "name": "ARM(arm-none-eabi)",
+            "compilerPath": "E:/Program Files/arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi/bin/arm-none-eabi-gcc.exe",
+            "includePath": [
+                "${workspaceFolder}/source/modules/**",
+                "${workspaceFolder}/source/port/**",
+                "${workspaceFolder}/source/common/**",
+                "${workspaceFolder}/source/app/**"
+            ],
+            "cStandard": "c99",
+            "intelliSenseMode": "gcc-arm"
+        }
+    ]
+}
