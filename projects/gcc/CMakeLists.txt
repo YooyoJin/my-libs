@@ -14,9 +14,17 @@ add_library(fanctrl STATIC ${SRC_ROOT}/modules/fanctrl/fanctrl.c)
 target_include_directories(fanctrl PUBLIC ${SRC_ROOT}/modules/fanctrl)
 target_compile_options(fanctrl PRIVATE -Wall -Wextra)  # 库本体保持零告警
 
+add_library(crc STATIC ${SRC_ROOT}/modules/crc/crc.c)
+target_include_directories(crc PUBLIC ${SRC_ROOT}/modules/crc)
+target_compile_options(crc PRIVATE -Wall -Wextra)
+
 # 将来: add_library(pidcore STATIC ${SRC_ROOT}/modules/pidcore/pidcore.c)
 
 # ============ 应用目标(源码在 source/app/) ============
 add_executable(fanctrldemo ${SRC_ROOT}/app/pcdemo/fanctrldemo.c)
 target_include_directories(fanctrldemo PRIVATE ${SRC_ROOT}/modules/fanctrl)
 target_link_libraries(fanctrldemo PRIVATE fanctrl)
+
+add_executable(crcdemo ${SRC_ROOT}/app/pcdemo/crcdemo.c)
+target_include_directories(crcdemo PRIVATE ${SRC_ROOT}/modules/crc)
+target_link_libraries(crcdemo PRIVATE crc)

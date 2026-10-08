@@ -1,25 +1,24 @@
-# source/app/pcdemo/——PC端仿真验证
+# source/app/pcdemo/——PC端验证演示集
 
-用途:在电脑上(gcc直接编译,无需IDE和板子)验证fanctrl模块逻辑。
+用途: 在电脑上(gcc直接编译, 无需IDE和板子)验证各模块。
 
-## 内容
+## 演示清单
 
-- fanctrldemo.c——假风机模型(转速正比于占空比+按12脉冲/转生成反馈电平)
-  + 场景脚本:启动20s强转→30s换挡→55s拔反馈→搜索→故障锁定
-  + 每秒打印曲线(t/状态/SV/PV/Output/duty)
+| 可执行 | 验证对象 | 判据 |
+|---|---|---|
+| fanctrldemo.exe | fanctrl | 强转20s→PID收敛→换挡→拔反馈→搜索→Fault, 全状态流转 |
+| crcdemo.exe | crc | 标准校验值0x4B37三法一致; Modbus小端填帧整帧复算=0x0000; 大端错误填法必非0 |
 
-## 构建与运行(在仓库根执行,工程文件位于projects/gcc)
+## 构建与运行(在仓库根执行, 工程文件位于projects/gcc)
 
 ```
 cmake -S projects/gcc -B projects/gcc/build -G "MinGW Makefiles"
 cmake --build projects/gcc/build
 .\projects\gcc\build\fanctrldemo.exe
+.\projects\gcc\build\crcdemo.exe
 ```
 
-## 验证判据(肉眼)
+## crcdemo重点: Modbus字节序是生死线
 
-1. 前20s Output保持6700不动(强转期)
-2. 20s后PID开始调节,PV向SV收敛
-3. 30s换挡后无强转,PV追向新目标
-4. 55s拔反馈→65s进Search→每2s输出步进-500
-5. 两轮搜索超时后Fault锁定(duty=0)
+- CRC寄存器值按[低字节][高字节]上送(小端线序)
+- 接收端校验技巧: 把CRC并入整帧再算, 结果恒为0x0000即为合法帧

@@ -24,6 +24,7 @@ extern "C" {
  * @param   u16Len  数据长度
  * @return  CRC寄存器值; Modbus发送时低字节在前
  * @note    初值0xFFFF, 多项式x^16+x^15+x^2+1 (Modbus RTU标准)
+ *          上送填帧时低字节在前(小端线序): frame[i]=低字节, frame[i+1]=高字节
  */
 uint16_t Crc16Modbus(const uint8_t *pu8Msg, uint16_t u16Len);
 
