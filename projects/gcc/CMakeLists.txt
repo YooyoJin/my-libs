@@ -7,6 +7,10 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # 导出compile_commands.json供VS Code IntelliSense使用(跳转/补全)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# 中文输出适配: 源码UTF-8, 但Windows中文终端默认GBK解码,
+# 故把字符串字面量编译成GBK(-fexec-charset), 免去每次chcp 65001
+add_compile_options(-finput-charset=UTF-8 -fexec-charset=GBK)
+
 set(SRC_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../source)
 
 # ============ 模块库登记处(每加一个模块在这里加一段) ============
