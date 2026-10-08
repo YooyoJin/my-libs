@@ -4,15 +4,14 @@
     "cmake.buildDirectory": "${workspaceFolder}/projects/gcc/build",
     "cmake.generator": "MinGW Makefiles",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
-    "files.associations": {
-        "fanctrl.h": "c",
-        "fancfg.h": "c",
-        "stdint.h": "c",
-        "stdbool.h": "c"
-    },
-    "search.exclude": {
-        "**/build*/**": true,
-        "**/Objects/**": true,
-        "**/Listings/**": true
-    }
+
+    // 一网打尽, 告诉VSCode这些文件当C语言处理，不然头文件可能被当成C++处理
+    "files.associations": { "*.h": "c" },
+
+    // 把构建垃圾挡在搜索结果之外
+    // "search.exclude": {
+    //     "**/build*/**": true,
+    //     "**/Objects/**": true,
+    //     "**/Listings/**": true
+    // }
 }

@@ -11,7 +11,6 @@
 #include "fanctrl.h"
 #include "fancfg.h"
 
-static const FanCfg kstCfg = FAN_CFG_DEFAULT;
 static FanCtrl  kstFan;
 static uint16_t g_u16DutyPm = 0;   /* 钩子捕获的最近占空比 */
 static bool     g_bLevel = false;  /* 假反馈电平 */
@@ -28,6 +27,7 @@ static const char *StateName(FanState eState)
 
 int main(void)
 {
+    const FanCfg kstCfg = FanCfgDefault(); /* 默认配置(需要微调时在此改字段) */
     const FanPort kstPort = {DemoWriteDuty, DemoReadLevel};
     const uint32_t u32TicksPerSec = 1000000uL / 512uL; /* 512us 滴答 */
     double   dblEdgeAcc = 0.0;

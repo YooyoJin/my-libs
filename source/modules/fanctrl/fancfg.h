@@ -18,41 +18,46 @@
 #include "fanctrl.h"
 
 /* 用法示例:
- *   static const FanCfg kstFanCfg = FAN_CFG_DEFAULT;
- *   FanCtrlInit(&kstFan1, &kstFanCfg, &kstFanPort1);
+ *   FanCfg stCfg = FanCfgDefault();            直接用默认
+ *   FanCtrlInit(&kstFan1, &stCfg, &kstFanPort1);
  *
- *   板级调参: 复制一份宏改名后按需修改数值, 不要直接改本预设。
+ *   板级调参(继承默认后微调, 比宏安全):
+ *   FanCfg stCfg = FanCfgDefault();
+ *   stCfg.u8StartupHoldSec = 5;
  */
-#define FAN_CFG_DEFAULT                                  \
-{                                                       \
-    /* 输出量纲 (反向刻度) */                             \
-    .u16OutAtMaxRpm   = 1500u,                          \
-    .u16OutAtMinRpm   = 7000u,                          \
-    .u16OutStartup    = 6700u,                          \
-    .u16OutSearchStep = 500u,                           \
-                                                        \
-    /* 增量式 PID */                                      \
-    .s16PidKp = 5,                                      \
-    .s16PidKi = 1,                                      \
-    .s16PidKd = 1,                                      \
-                                                        \
-    /* 反馈测速 (512us 滴答, 12 脉冲/转=24 边沿/转, 每转测一次) */  \
-    .u16TickUs      = 512u,                             \
-    .u8PulsePerRev  = 12u,                              \
-    .u8PulseDivide  = 24u,                              \
-    .u8PidDivide    = 1u,                               \
-                                                        \
-    /* 转速限幅 (RPM) */                                   \
-    .u16RpmMin = 200u,                                  \
-    .u16RpmMax = 1500u,                                 \
-                                                        \
-    /* 启动/保护时序 (秒) */                               \
-    .u8StartupHoldSec   = 20u,                          \
-    .u8NoFeedJudgeSec   = 10u,                          \
-    .u8SearchStepSec    = 2u,                           \
-    .u8SearchTimeoutSec = 30u,                          \
-    .u8SearchRetryMax   = 2u,                           \
-    .u8RetryStopSec     = 5u,                           \
+static inline FanCfg FanCfgDefault(void)
+{
+    FanCfg stCfg = {
+        /* 输出量纲 (反向刻度) */
+        .u16OutAtMaxRpm   = 1500u,
+        .u16OutAtMinRpm   = 7000u,
+        .u16OutStartup    = 6700u,
+        .u16OutSearchStep = 500u,
+
+        /* 增量式 PID */
+        .s16PidKp = 5,
+        .s16PidKi = 1,
+        .s16PidKd = 1,
+
+        /* 反馈测速 (512us 滴答, 12 脉冲/转=24 边沿/转, 每转测一次) */
+        .u16TickUs      = 512u,
+        .u8PulsePerRev  = 12u,
+        .u8PulseDivide  = 24u,
+        .u8PidDivide    = 1u,
+
+        /* 转速限幅 (RPM) */
+        .u16RpmMin = 200u,
+        .u16RpmMax = 1500u,
+
+        /* 启动/保护时序 (秒) */
+        .u8StartupHoldSec   = 20u,
+        .u8NoFeedJudgeSec   = 10u,
+        .u8SearchStepSec    = 2u,
+        .u8SearchTimeoutSec = 30u,
+        .u8SearchRetryMax   = 2u,
+        .u8RetryStopSec     = 5u,
+    };
+    return stCfg;
 }
 
 #endif /* FANCFG_H */

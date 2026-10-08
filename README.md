@@ -78,13 +78,13 @@ E:\MyWorkspace\Project\other\blog\my-libs
 #include "fanctrl.h"
 #include "fancfg.h"
 
-static const FanCfg kstFanCfg  = FAN_CFG_DEFAULT;
 static FanCtrl kstFan1;
 
 /* 移植层只需实现两个钩子：写占空比(千分比) + 读反馈电平 */
 static const FanPort kstFanPort1 = { BoardFan1WriteDuty, BoardFan1ReadLevel };
 
-FanCtrlInit(&kstFan1, &kstFanCfg, &kstFanPort1);
+FanCfg stCfg = FanCfgDefault();   /* 默认配置, 板级微调直接改字段 */
+FanCtrlInit(&kstFan1, &stCfg, &kstFanPort1);
 FanCtrlSetTargetRpm(&kstFan1, 660);
 FanCtrlStart(&kstFan1);
 /* 512us中断调FanCtrlTickFast(); 1s任务调FanCtrlTickSecond(); */
