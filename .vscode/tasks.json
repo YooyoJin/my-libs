@@ -16,17 +16,22 @@
         },
         {
             "label": "run-pc(仿真)",
-            "type": "shell",
             "command": "projects/gcc/build/fanctrldemo.exe",
             "dependsOn": "build-pc(仿真)",
             "problemMatcher": []
         },
         {
-            "label": "build-arm(交叉库)",
+            "label": "build-arm(交叉固件)",
             "type": "shell",
-            "command": "cmake -S projects/armgcc -B projects/armgcc/build -G \"MinGW Makefiles\" -DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/projects/armgcc/toolchainarmgcc.cmake && cmake --build projects/armgcc/build",
+            "command": "cmake --build projects/armgcc/build",
             "problemMatcher": ["$gcc"],
             "group": "build"
+        },
+        {
+            "label": "configure-arm(交叉配置)",
+            "type": "shell",
+            "command": "cmake -S projects/armgcc -B projects/armgcc/build -G \"MinGW Makefiles\" -DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/projects/armgcc/toolchainarmgcc.cmake",
+            "problemMatcher": []
         }
     ]
 }
