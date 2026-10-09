@@ -7,12 +7,14 @@
 #include <stdbool.h>
 #include "apptimer.h"
 #include "bspclk.h"
+#include "appexcute.h"
 
 typedef void (*AppTaskFn)(void);
 
 // 1s任务表: 为了提高实时性, 1s任务拆分成100个10ms时间片分时执行
+// (槽位N的任务在每秒的第N×10ms执行; 槽位即执行时刻, 按需错峰登记)
 static const AppTaskFn g_apfnTimer1sTaskList[] = {
-    // 将来的周期任务在此登记(每个槽位占10ms)
+    AppExcuteHeartbeatTask,   // 槽位0: 心跳日志(见appexcute.c)
 };
 
 static uint32_t      g_u32SystemTickMs  = 0;  // 系统毫秒节拍

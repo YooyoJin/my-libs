@@ -36,8 +36,9 @@ static void SystemInitAll(void)
 
 /**
  * @brief  应用入口
+ * @note   main不返回(裸机主循环); 标准C要求返回int, 故返回类型为int
  */
-void main(void)
+int main(void)
 {
     SystemInitAll();
     LOG_INFO("SystemCoreClock: %uHz", SystemCoreClock);

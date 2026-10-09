@@ -3,6 +3,7 @@
  * @brief   HC32F460时钟初始化+SysTick实现(BSP层)
  * @note    移植自My-OTA工程bsp_clk.c, 逻辑未改动
  */
+#include "log.h"
 #include "bspboardtype.h"
 #include "bspclk.h"
 #include "hc32_ll_clk.h"
@@ -10,6 +11,7 @@
 #include "hc32_ll_sram.h"
 #include "hc32_ll_efm.h"
 #include "hc32_ll_utility.h"
+#include "hc32_ll_pwc.h"
 
 static SysTickCallbackFn g_pfnSysTickCallback = NULL;
 
@@ -90,7 +92,10 @@ void BspClkInit(void)
 /** @brief SysTick初始化(1ms) */
 void BspSysTickInit(void)
 {
-    SysTick_Init(1000U);
+    if (LL_OK != SysTick_Init(1000U))
+    {
+        LOG_ERROR("SysTick init FAILED");
+    }
 }
 
 /** @brief 注册SysTick回调 */
