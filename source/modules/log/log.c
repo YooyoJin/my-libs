@@ -63,7 +63,7 @@ void LogPrint(LogLevel eLevel, const char *pcFile, uint32_t u32Line, const char 
 
     // 前缀: 级别 + 文件名 + 行号
     iLen = snprintf(cBuffer, sizeof(cBuffer), "%s%s:%u ",
-                    g_apcLevelStr[eLevel], LogGetFileName(pcFile), u32Line);
+                    g_apcLevelStr[eLevel], LogGetFileName(pcFile), (unsigned int)u32Line);
     if (iLen <= 0 || iLen >= (int)sizeof(cBuffer))
     {
         return;

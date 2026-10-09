@@ -1,17 +1,29 @@
 {
     "files.encoding": "utf8",
-    "cmake.sourceDirectory": "${workspaceFolder}/projects/gcc",
-    "cmake.buildDirectory": "${workspaceFolder}/projects/gcc/build",
+
+    // 修改此处可以决定编译哪个工程，编译器需先Deleat build directory
+    // "cmake.sourceDirectory": "${workspaceFolder}/projects/armgcc",  // 绑定ARM工程
+    // "cmake.buildDirectory":  "${workspaceFolder}/projects/armgcc/build",
+    "cmake.sourceDirectory": "${workspaceFolder}/projects/gcc",  // 绑定PC工程
+    "cmake.buildDirectory":  "${workspaceFolder}/projects/gcc/build",
     "cmake.generator": "MinGW Makefiles",
+
+    // 关键: 让插件配置时带上交叉工具链文件。
+    // 否则CMake按本机Windows工程测链接(--major-image-version), arm链接器必报错
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/projects/armgcc/toolchainarmgcc.cmake"
+    },
+
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
 
-    // 一网打尽, 告诉VSCode这些文件当C语言处理，不然头文件可能被当成C++处理
+    // 告诉VSCode这些文件当C语言处理，不然头文件可能被当成C++处理
     "files.associations": { "*.h": "c" },
 
     // 把构建垃圾挡在搜索结果之外
-    // "search.exclude": {
-    //     "**/build*/**": true,
-    //     "**/Objects/**": true,
-    //     "**/Listings/**": true
-    // }
+    "search.exclude": {
+        "**/build*/**": true,
+        "**/Objects/**": true,
+        "**/Listings/**": true,
+        "**/*.md": true,  // 排除所有md
+    },
 }
