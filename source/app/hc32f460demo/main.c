@@ -23,13 +23,18 @@
  */
 static void SystemInitAll(void)
 {
-    LL_PERIPH_WE(LL_PERIPH_ALL);   // 解锁外写保护
+    // todo 临时诊断代码: 每步打检查点, 定位初次硬错误发生在哪一步(破案后移除)
+    LL_PERIPH_WE(LL_PERIPH_ALL);  // 解锁外写保护
 
     RttLogInit();                 // log模块+RTT后端
+    LOG_INFO("[ck1] rtt ok");
     BspClkInit();                 // 时钟(200MHz)
+    LOG_INFO("[ck2] clk ok, src=0x%X stable=0x%X", (unsigned)(CM_CMU->CKSWR & 0x07U), (unsigned)(*(volatile uint8_t *)0x40054034UL));
     BspSysTickInit();             // 1ms节拍
-    BspLedInit();                 // 心跳LED
+    LOG_INFO("[ck3] systick ctrl=0x%X load=%u", (unsigned)(*(volatile uint32_t *)0xE000E010UL), (unsigned)(*(volatile uint32_t *)0xE000E014UL));
+    BspLedInit();
     AppTimerInit();               // 时间片调度
+    LOG_INFO("[ck4] all init done");
 
     LL_PERIPH_WP(LL_PERIPH_ALL);  // 重新上写保护
 }
@@ -49,7 +54,7 @@ int main(void)
 
     while (1)
     {
-        BspLedBlinking(1);   // 心跳+阻塞延时
+        //BspLedBlinking(1);   // 心跳+阻塞延时
         AppTimerTaskRun();   // 时间片任务
     }
 }

@@ -11,7 +11,12 @@
         {
             "label": "configure-pc(仿真)",
             "type": "shell",
-            "command": "cmake -S projects/gcc -B projects/gcc/build -G \"MinGW Makefiles\"",
+            "command": "cmake",
+            "args": [
+                "-S", "projects/gcc",
+                "-B", "projects/gcc/build",
+                "-G", "MinGW Makefiles"
+            ],
             "problemMatcher": []
         },
         {
@@ -30,7 +35,13 @@
         {
             "label": "configure-arm(交叉配置)",
             "type": "shell",
-            "command": "cmake -S projects/armgcc -B projects/armgcc/build -G \"MinGW Makefiles\" -DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/projects/armgcc/toolchainarmgcc.cmake",
+            "command": "cmake",
+            "args": [
+                "-S", "projects/armgcc",
+                "-B", "projects/armgcc/build",
+                "-G", "MinGW Makefiles",
+                "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/projects/armgcc/toolchainarmgcc.cmake"
+            ],
             "problemMatcher": []
         }
     ]

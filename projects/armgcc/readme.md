@@ -9,7 +9,7 @@ cmake -S projects/armgcc -B projects/armgcc/build -G "MinGW Makefiles" -DCMAKE_T
 cmake --build projects/armgcc/build
 ```
 
-一键: VS Code任务`build-arm(交叉库)`。
+一键: VS Code任务`configure-arm(交叉配置)` + VS Code任务`build-arm(交叉固件)`。
 
 ## 产物(build/目录)
 
