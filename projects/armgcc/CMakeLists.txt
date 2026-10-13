@@ -67,6 +67,7 @@ target_include_directories(hc32f460demo PRIVATE
 )
 target_link_libraries(hc32f460demo PRIVATE fanctrl crc log)
 target_link_options(hc32f460demo PRIVATE
+    -nostartfiles   # 去掉GNU默认crt0/crtbegin: 自己有启动文件; crtbegin的frame_dummy会在main前崩溃(裸机无EH运行时)
     ${MCU_FLAGS}
     -T${LINKER_SCRIPT}
     -Wl,--gc-sections
