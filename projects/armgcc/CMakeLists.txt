@@ -15,6 +15,8 @@ set(CHIP    hc32f460)
 set(MCU_FLAGS -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
 add_compile_options(${MCU_FLAGS} -ffunction-sections -fdata-sections)
 add_compile_definitions(HC32F460 USE_DDL_DRIVER)
+# 与能跑工程对齐: Debug构建(生成完整调试信息)
+add_compile_options(-g -O0 -DDEBUG)
 set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -x assembler-with-cpp")
 
 # 链接脚本: xE=512KB(PETB/PETG), xC=256KB(KCTA); 可被-DLINKER_SCRIPT覆盖
@@ -67,7 +69,6 @@ target_include_directories(hc32f460demo PRIVATE
 )
 target_link_libraries(hc32f460demo PRIVATE fanctrl crc log)
 target_link_options(hc32f460demo PRIVATE
-    -nostartfiles   # 去掉GNU默认crt0/crtbegin: 自己有启动文件; crtbegin的frame_dummy会在main前崩溃(裸机无EH运行时)
     ${MCU_FLAGS}
     -T${LINKER_SCRIPT}
     -Wl,--gc-sections

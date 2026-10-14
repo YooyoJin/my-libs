@@ -8,10 +8,6 @@
  */
 
 #include <errno.h>
-
-// _init: 正常由crti.o提供(空函数), -nostartfiles移除后需自补
-// __libc_init_array内部会调用它(C构造框架入口, 裸机为空即可)
-void _init(void) {}
 #include <sys/stat.h>
 #include <sys/times.h>
 #include <sys/unistd.h>
