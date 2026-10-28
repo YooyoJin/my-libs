@@ -1,124 +1,90 @@
 /**
  * @file    crc.c
- * @brief   CRC校验模块实现(Modbus CRC16, 查表+位运算)
+ * @brief   CRC校验模块实现(CRC-16/MODBUS, 查表+位运算)
+ * @note    查表法为uint16_t单表: crc = (crc>>8) ^ tab[(crc^data)&0xFF],
+ *          状态高低字节即CRC寄存器高低字节
  */
 #include "crc.h"
 
-// CRC16查找表(Modbus, 反转)——状态高字节表
-// 注: 原My-OTA工程此表命名au8CRCHi且按(高<<8|低)拼装, 导致查表法
-//     返回值与位运算法字节序对调(遗留隐患), 本模块已修正拼装顺序
-static const uint8_t g_au8CrcHiTab[] = {
-    0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41, 0X01, 0XC0,
-    0X80, 0X41, 0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41,
-    0X00, 0XC1, 0X81, 0X40, 0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0,
-    0X80, 0X41, 0X01, 0XC0, 0X80, 0X41, 0X00, 0XC1, 0X81, 0X40,
-    0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41, 0X00, 0XC1,
-    0X81, 0X40, 0X01, 0XC0, 0X80, 0X41, 0X01, 0XC0, 0X80, 0X41,
-    0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41, 0X00, 0XC1,
-    0X81, 0X40, 0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41,
-    0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41, 0X01, 0XC0,
-    0X80, 0X41, 0X00, 0XC1, 0X81, 0X40, 0X00, 0XC1, 0X81, 0X40,
-    0X01, 0XC0, 0X80, 0X41, 0X01, 0XC0, 0X80, 0X41, 0X00, 0XC1,
-    0X81, 0X40, 0X01, 0XC0, 0X80, 0X41, 0X00, 0XC1, 0X81, 0X40,
-    0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41, 0X01, 0XC0,
-    0X80, 0X41, 0X00, 0XC1, 0X81, 0X40, 0X00, 0XC1, 0X81, 0X40,
-    0X01, 0XC0, 0X80, 0X41, 0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0,
-    0X80, 0X41, 0X01, 0XC0, 0X80, 0X41, 0X00, 0XC1, 0X81, 0X40,
-    0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41, 0X01, 0XC0,
-    0X80, 0X41, 0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41,
-    0X00, 0XC1, 0X81, 0X40, 0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0,
-    0X80, 0X41, 0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41,
-    0X01, 0XC0, 0X80, 0X41, 0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0,
-    0X80, 0X41, 0X00, 0XC1, 0X81, 0X40, 0X00, 0XC1, 0X81, 0X40,
-    0X01, 0XC0, 0X80, 0X41, 0X01, 0XC0, 0X80, 0X41, 0X00, 0XC1,
-    0X81, 0X40, 0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41,
-    0X00, 0XC1, 0X81, 0X40, 0X01, 0XC0, 0X80, 0X41, 0X01, 0XC0,
-    0X80, 0X41, 0X00, 0XC1, 0X81, 0X40,
-};
-
-// CRC16查找表(Modbus, 反转)——低字节表
-static const uint8_t g_au8CrcLoTab[] = {
-    0X00, 0XC0, 0XC1, 0X01, 0XC3, 0X03, 0X02, 0XC2, 0XC6, 0X06,
-    0X07, 0XC7, 0X05, 0XC5, 0XC4, 0X04, 0XCC, 0X0C, 0X0D, 0XCD,
-    0X0F, 0XCF, 0XCE, 0X0E, 0X0A, 0XCA, 0XCB, 0X0B, 0XC9, 0X09,
-    0X08, 0XC8, 0XD8, 0X18, 0X19, 0XD9, 0X1B, 0XDB, 0XDA, 0X1A,
-    0X1E, 0XDE, 0XDF, 0X1F, 0XDD, 0X1D, 0X1C, 0XDC, 0X14, 0XD4,
-    0XD5, 0X15, 0XD7, 0X17, 0X16, 0XD6, 0XD2, 0X12, 0X13, 0XD3,
-    0X11, 0XD1, 0XD0, 0X10, 0XF0, 0X30, 0X31, 0XF1, 0X33, 0XF3,
-    0XF2, 0X32, 0X36, 0XF6, 0XF7, 0X37, 0XF5, 0X35, 0X34, 0XF4,
-    0X3C, 0XFC, 0XFD, 0X3D, 0XFF, 0X3F, 0X3E, 0XFE, 0XFA, 0X3A,
-    0X3B, 0XFB, 0X39, 0XF9, 0XF8, 0X38, 0X28, 0XE8, 0XE9, 0X29,
-    0XEB, 0X2B, 0X2A, 0XEA, 0XEE, 0X2E, 0X2F, 0XEF, 0X2D, 0XED,
-    0XEC, 0X2C, 0XE4, 0X24, 0X25, 0XE5, 0X27, 0XE7, 0XE6, 0X26,
-    0X22, 0XE2, 0XE3, 0X23, 0XE1, 0X21, 0X20, 0XE0, 0XA0, 0X60,
-    0X61, 0XA1, 0X63, 0XA3, 0XA2, 0X62, 0X66, 0XA6, 0XA7, 0X67,
-    0XA5, 0X65, 0X64, 0XA4, 0X6C, 0XAC, 0XAD, 0X6D, 0XAF, 0X6F,
-    0X6E, 0XAE, 0XAA, 0X6A, 0X6B, 0XAB, 0X69, 0XA9, 0XA8, 0X68,
-    0X78, 0XB8, 0XB9, 0X79, 0XBB, 0X7B, 0X7A, 0XBA, 0XBE, 0X7E,
-    0X7F, 0XBF, 0X7D, 0XBD, 0XBC, 0X7C, 0XB4, 0X74, 0X75, 0XB5,
-    0X77, 0XB7, 0XB6, 0X76, 0X72, 0XB2, 0XB3, 0X73, 0XB1, 0X71,
-    0X70, 0XB0, 0X50, 0X90, 0X91, 0X51, 0X93, 0X53, 0X52, 0X92,
-    0X96, 0X56, 0X57, 0X97, 0X55, 0X95, 0X94, 0X54, 0X9C, 0X5C,
-    0X5D, 0X9D, 0X5F, 0X9F, 0X9E, 0X5E, 0X5A, 0X9A, 0X9B, 0X5B,
-    0X99, 0X59, 0X58, 0X98, 0X88, 0X48, 0X49, 0X89, 0X4B, 0X8B,
-    0X8A, 0X4A, 0X4E, 0X8E, 0X8F, 0X4F, 0X8D, 0X4D, 0X4C, 0X8C,
-    0X44, 0X84, 0X85, 0X45, 0X87, 0X47, 0X46, 0X86, 0X82, 0X42,
-    0X43, 0X83, 0X41, 0X81, 0X80, 0X40,
+// CRC16查找表(Modbus)——256项x16bit, 标准CRC-16/MODBUS表
+// 生成规则: 初值取索引i, 经8轮(右移1位, 最低位为1时再异或0xA001)
+static const uint16_t g_au16CrcTab[] = {
+    0X0000, 0XC0C1, 0XC181, 0X0140, 0XC301, 0X03C0, 0X0280, 0XC241,
+    0XC601, 0X06C0, 0X0780, 0XC741, 0X0500, 0XC5C1, 0XC481, 0X0440,
+    0XCC01, 0X0CC0, 0X0D80, 0XCD41, 0X0F00, 0XCFC1, 0XCE81, 0X0E40,
+    0X0A00, 0XCAC1, 0XCB81, 0X0B40, 0XC901, 0X09C0, 0X0880, 0XC841,
+    0XD801, 0X18C0, 0X1980, 0XD941, 0X1B00, 0XDBC1, 0XDA81, 0X1A40,
+    0X1E00, 0XDEC1, 0XDF81, 0X1F40, 0XDD01, 0X1DC0, 0X1C80, 0XDC41,
+    0X1400, 0XD4C1, 0XD581, 0X1540, 0XD701, 0X17C0, 0X1680, 0XD641,
+    0XD201, 0X12C0, 0X1380, 0XD341, 0X1100, 0XD1C1, 0XD081, 0X1040,
+    0XF001, 0X30C0, 0X3180, 0XF141, 0X3300, 0XF3C1, 0XF281, 0X3240,
+    0X3600, 0XF6C1, 0XF781, 0X3740, 0XF501, 0X35C0, 0X3480, 0XF441,
+    0X3C00, 0XFCC1, 0XFD81, 0X3D40, 0XFF01, 0X3FC0, 0X3E80, 0XFE41,
+    0XFA01, 0X3AC0, 0X3B80, 0XFB41, 0X3900, 0XF9C1, 0XF881, 0X3840,
+    0X2800, 0XE8C1, 0XE981, 0X2940, 0XEB01, 0X2BC0, 0X2A80, 0XEA41,
+    0XEE01, 0X2EC0, 0X2F80, 0XEF41, 0X2D00, 0XEDC1, 0XEC81, 0X2C40,
+    0XE401, 0X24C0, 0X2580, 0XE541, 0X2700, 0XE7C1, 0XE681, 0X2640,
+    0X2200, 0XE2C1, 0XE381, 0X2340, 0XE101, 0X21C0, 0X2080, 0XE041,
+    0XA001, 0X60C0, 0X6180, 0XA141, 0X6300, 0XA3C1, 0XA281, 0X6240,
+    0X6600, 0XA6C1, 0XA781, 0X6740, 0XA501, 0X65C0, 0X6480, 0XA441,
+    0X6C00, 0XACC1, 0XAD81, 0X6D40, 0XAF01, 0X6FC0, 0X6E80, 0XAE41,
+    0XAA01, 0X6AC0, 0X6B80, 0XAB41, 0X6900, 0XA9C1, 0XA881, 0X6840,
+    0X7800, 0XB8C1, 0XB981, 0X7940, 0XBB01, 0X7BC0, 0X7A80, 0XBA41,
+    0XBE01, 0X7EC0, 0X7F80, 0XBF41, 0X7D00, 0XBDC1, 0XBC81, 0X7C40,
+    0XB401, 0X74C0, 0X7580, 0XB541, 0X7700, 0XB7C1, 0XB681, 0X7640,
+    0X7200, 0XB2C1, 0XB381, 0X7340, 0XB101, 0X71C0, 0X7080, 0XB041,
+    0X5000, 0X90C1, 0X9181, 0X5140, 0X9301, 0X53C0, 0X5280, 0X9241,
+    0X9601, 0X56C0, 0X5780, 0X9741, 0X5500, 0X95C1, 0X9481, 0X5440,
+    0X9C01, 0X5CC0, 0X5D80, 0X9D41, 0X5F00, 0X9FC1, 0X9E81, 0X5E40,
+    0X5A00, 0X9AC1, 0X9B81, 0X5B40, 0X9901, 0X59C0, 0X5880, 0X9841,
+    0X8801, 0X48C0, 0X4980, 0X8941, 0X4B00, 0X8BC1, 0X8A81, 0X4A40,
+    0X4E00, 0X8EC1, 0X8F81, 0X4F40, 0X8D01, 0X4DC0, 0X4C80, 0X8C41,
+    0X4400, 0X84C1, 0X8581, 0X4540, 0X8701, 0X47C0, 0X4680, 0X8641,
+    0X8201, 0X42C0, 0X4380, 0X8341, 0X4100, 0X81C1, 0X8081, 0X4040
 };
 
 /**
- * @brief Modbus CRC16查表法,整块计算
- * @note  计算流程(反转CRC): 指针逐字节前移, CRC寄存器(高/低字节)
- *        每步用"当前高字节^数据字节"查表更新; 发送时高字节在前
+ * @brief Modbus CRC16查表法，整块计算
+ * @note  每字节一步: 索引=(crc^数据)低8位, crc=(crc>>8)^表项
  */
 uint16_t Crc16Modbus(const uint8_t *pu8Msg, uint16_t u16Len)
 {
-    uint8_t u8CrcHi = 0xFF; // 按Modbus RTU定义,初值0xFFFF
-    uint8_t u8CrcLo = 0xFF;
-    uint8_t u8Index;
+    uint16_t u16Crc = 0xFFFF; // 按Modbus RTU定义，初值0xFFFF
 
-    while (u16Len--)
-    {
-        u8Index = u8CrcHi ^ *pu8Msg++;
-        u8CrcHi = u8CrcLo ^ g_au8CrcHiTab[u8Index];
-        u8CrcLo = g_au8CrcLoTab[u8Index];
+    while (u16Len--) {
+        u16Crc = (uint16_t)(u16Crc >> 8) ^ g_au16CrcTab[(uint8_t)u16Crc ^ *pu8Msg++];
     }
 
-    // 注: 查表法内部状态的高低字节与CRC寄存器相反, 拼装时对调
-    return ((uint16_t)u8CrcLo << 8) | u8CrcHi;
+    return u16Crc;
 }
 
-/** @brief Modbus CRC16查表法,单字节步进(流式) */
-void Crc16ModbusStep(uint8_t u8Data, uint8_t *pu8CrcHi, uint8_t *pu8CrcLo)
+/**
+ * @brief Modbus CRC16查表法，单字节步进(流式)，即每次输入1字节
+*/
+void Crc16ModbusStep(uint8_t u8Data, uint16_t *pu16Crc)
 {
-    uint8_t u8Index;
-
-    u8Index   = *pu8CrcHi ^ u8Data;
-    *pu8CrcHi = *pu8CrcLo ^ g_au8CrcHiTab[u8Index];
-    *pu8CrcLo = g_au8CrcLoTab[u8Index];
+    *pu16Crc = (uint16_t)(*pu16Crc >> 8) ^ g_au16CrcTab[(uint8_t)*pu16Crc ^ u8Data];
 }
 
-/** @brief Modbus CRC16位运算法(不依赖查找表) */
+/** @brief Modbus CRC16位运算法(不依赖查找表)
+ *  @note 逐位右移, 最低位为1时异或0xA001, 与查表法逐字节等价
+*/
 uint16_t Crc16ModbusBitwise(const uint8_t *pu8Msg, uint16_t u16Len)
 {
     uint16_t u16Crc = 0xFFFF;
     uint16_t u16i, u16j;
 
-    for (u16i = 0; u16i < u16Len; u16i++)
-    {
+    for (u16i = 0; u16i < u16Len; u16i++) {
         u16Crc ^= (uint16_t)pu8Msg[u16i];
-        for (u16j = 0; u16j < 8; u16j++)
-        {
-            if (u16Crc & 0x0001u)
-            {
+        for (u16j = 0; u16j < 8; u16j++) {
+            if (u16Crc & 0x0001u) {
                 u16Crc >>= 1;
-                u16Crc ^= 0xA001u; // x^16 + x^15 + x^2 + 1
-            }
-            else
-            {
+                u16Crc ^= 0xA001u;  // x^16 + x^15 + x^2 + 1
+            } else {
                 u16Crc >>= 1;
             }
         }
     }
+
     return u16Crc;
 }

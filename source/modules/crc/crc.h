@@ -7,7 +7,7 @@
  *   - Crc16ModbusStep:   查表法,单字节步进(流式场景)
  *   - Crc16ModbusBitwise:位运算法,不依赖查找表(省ROM场景)
  *
- * @version v0.1.0 (移植自My-OTA工程cmn_crc, 按my-libs风格改造)
+ * @version v0.2.0 (v0.1.0移植自My-OTA工程cmn_crc; v0.2.0查表改uint16_t单表)
  */
 #ifndef CRC_H
 #define CRC_H
@@ -31,11 +31,10 @@ uint16_t Crc16Modbus(const uint8_t *pu8Msg, uint16_t u16Len);
 /**
  * @brief   Modbus CRC16查表法,单字节步进(流式计算用)
  * @param   u8Data    新增数据字节
- * @param   pu8CrcHi  状态字节1(使用前置0xFF, 出参更新)
- * @param   pu8CrcLo  状态字节2(使用前置0xFF, 出参更新)
- * @note    全部数据喂完后CRC = (状态2<<8)|状态1, 与Crc16Modbus一致
+ * @param   pu16Crc   CRC状态(使用前置0xFFFF, 出参更新)
+ * @note    全部数据喂完后CRC即为*pu16Crc, 与Crc16Modbus一致
  */
-void Crc16ModbusStep(uint8_t u8Data, uint8_t *pu8CrcHi, uint8_t *pu8CrcLo);
+void Crc16ModbusStep(uint8_t u8Data, uint16_t *pu16Crc);
 
 /**
  * @brief   Modbus CRC16位运算法(逐位,不依赖查找表)

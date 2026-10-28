@@ -38,7 +38,7 @@ app  →  modules  →  (钩子) ←  port  ←  vendor
 | 目录 | 内容 |
 |---|---|
 | modules/fanctrl | PG/DC风机转速闭环 v0.1.1 |
-| modules/crc | Modbus CRC16(查表/步进/位运算) v0.1.0 |
+| modules/crc | Modbus CRC16(查表/步进/位运算) v0.2.0 |
 | modules/log | 分级日志(输出后端钩子化) v0.1.0 |
 | port/hc32f460 | 时钟/延时/LED/RTT日志后端/板级引脚表 |
 | vendor/hc32f460 | 华大HC32F460 SDK(含链接脚本/启动文件) |

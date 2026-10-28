@@ -24,7 +24,7 @@
 | 模块 | 功能 | 版本 | 状态 |
 |---|---|---|---|
 | [fanctrl](source/modules/fanctrl/readme.md) | PG/DC风机转速闭环（测速+增量PID+状态机+丢反馈三级保护） | v0.1.1 | ✅ 可用（仿真全场景验证通过） |
-| [crc](source/modules/crc/readme.md) | Modbus CRC16（查表/步进/位运算，三法互证0x4B37） | v0.1.0 | ✅ 可用 |
+| [crc](source/modules/crc/readme.md) | Modbus CRC16（查表/步进/位运算，三法互证0x4B37） | v0.2.0 | ✅ 可用 |
 | [log](source/modules/log/readme.md) | 分级日志（输出后端钩子化，RTT/UART可注入） | v0.1.0 | ✅ 可用 |
 | pidcore | 通用增量/位置式PID | — | 📋 规划（从fanctrl/CmpPID中长出） |
 | filters | 一阶滤波 / 滞回比较 / 斜率检测 | — | 📋 规划 |
