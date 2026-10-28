@@ -6,8 +6,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "apptimer.h"
-#include "bspclk.h"
 #include "appexcute.h"
+#include "log.h"
+#include "hc32_ll_utility.h"
 
 typedef void (*AppTaskFn)(void);
 
@@ -38,15 +39,26 @@ static void AppTimer1sTask(void)
     }
 }
 
-/** @brief 时间片调度初始化: 注册SysTick回调 */
+/**
+ * @brief  时间片调度初始化: 初始化SysTick(1ms)——前后台版在此拥有SysTick
+ * @note   FreeRTOS版不需要此函数(RTOS port自带SysTick_Handler)
+ */
 void AppTimerInit(void)
 {
-    BspSysTickRegisterCallback(AppTimerSysTickCallback);
+    if (LL_OK != SysTick_Init(1000U))
+    {
+        LOG_ERROR("SysTick init FAILED");
+    }
 }
 
-/** @brief SysTick回调(1ms中断上下文): 只做计数与置标志 */
-void AppTimerSysTickCallback(void)
+/**
+ * @brief  SysTick中断服务函数(1ms中断上下文)
+ * @note   前后台版在此定义——与FreeRTOS版互斥(不能同时存在)
+ */
+void SysTick_Handler(void)
 {
+    SysTick_IncTick();
+
     g_u16Tick10msCnt++;
     if (g_u16Tick10msCnt >= 10u)
     {

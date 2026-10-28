@@ -1,7 +1,7 @@
 /**
  * @file    apptimer.h
- * @brief   应用层时间片调度(1ms SysTick→10ms标志→分时1s任务表)
- * @note    移植自My-OTA工程app_timer; 第三次复用时抽成scheduler模块
+ * @brief   前后台版时间片调度+SysTick中断(归app层所有)
+ * @note    SysTick是调度资源——前后台版在此拥有, FreeRTOS版由RTOS port接管
  */
 #ifndef APPTIMER_H
 #define APPTIMER_H

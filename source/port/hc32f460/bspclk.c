@@ -13,8 +13,6 @@
 #include "hc32_ll_utility.h"
 #include "hc32_ll_pwc.h"
 
-static SysTickCallbackFn g_pfnSysTickCallback = NULL;
-
 /** @brief 系统时钟初始化: XTAL→MPLL 200MHz + 总线分频 + SRAM/Flash等待周期 */
 void BspClkInit(void)
 {
@@ -87,30 +85,4 @@ void BspClkInit(void)
     (void)GPIO_StructInit(&stcGpioInit);
     stcGpioInit.u16PinAttr = PIN_ATTR_ANALOG;
     (void)GPIO_Init(BSP_XTAL_OUT_PORT, BSP_XTAL_OUT_PIN, &stcGpioInit);
-}
-
-/** @brief SysTick初始化(1ms) */
-void BspSysTickInit(void)
-{
-    if (LL_OK != SysTick_Init(1000U))
-    {
-        LOG_ERROR("SysTick init FAILED");
-    }
-}
-
-/** @brief 注册SysTick回调 */
-void BspSysTickRegisterCallback(SysTickCallbackFn pfnCallback)
-{
-    g_pfnSysTickCallback = pfnCallback;
-}
-
-/** @brief SysTick中断服务函数: 累加LL库节拍+分发回调 */
-void SysTick_Handler(void)
-{
-    SysTick_IncTick();
-
-    if (g_pfnSysTickCallback != NULL)
-    {
-        g_pfnSysTickCallback();
-    }
 }
