@@ -85,3 +85,62 @@ add_custom_command(TARGET hc32f460demo POST_BUILD
     COMMAND ${CMAKE_SIZE}    $<TARGET_FILE:hc32f460demo>
     COMMENT "Generating hex/bin and print size"
 )
+
+# ----------------------------------------------------------------------------
+# FreeRTOS版固件: app/freertosdemo + FreeRTOS内核 + 同一套port/SDK
+# 注意: 不包含app/hc32f460demo(避免SysTick_Handler冲突)
+# ----------------------------------------------------------------------------
+set(FREERTOS_DIR ${VENDOR}/freertos)
+set(FREERTOS_SRC
+    ${FREERTOS_DIR}/tasks.c
+    ${FREERTOS_DIR}/queue.c
+    ${FREERTOS_DIR}/list.c
+    ${FREERTOS_DIR}/timers.c
+    ${FREERTOS_DIR}/event_groups.c
+    ${FREERTOS_DIR}/stream_buffer.c
+    ${FREERTOS_DIR}/portable/GCC/ARM_CM4F/port.c
+    ${FREERTOS_DIR}/portable/MemMang/heap_4.c
+)
+
+file(GLOB FREERTOS_APP_SRC ${SRC_ROOT}/app/freertosdemo/*.c)
+
+add_executable(freertosdemo
+    ${FREERTOS_APP_SRC}
+    ${PORT_SRC}
+    ${RTT_SRC}
+    ${SDK_SRC}
+    ${FREERTOS_SRC}
+    ${STARTUP_FILE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/syscalls.c
+)
+set_target_properties(freertosdemo PROPERTIES SUFFIX ".elf")
+
+target_include_directories(freertosdemo PRIVATE
+    ${SRC_ROOT}/app/freertosdemo
+    ${SRC_ROOT}/port/hc32f460
+    ${SRC_ROOT}/modules/fanctrl
+    ${SRC_ROOT}/modules/crc
+    ${SRC_ROOT}/modules/log
+    ${VENDOR}/seggerrtt
+    ${VENDOR}/${CHIP}
+    ${VENDOR}/${CHIP}/cmsis
+    ${VENDOR}/${CHIP}/hc32_ll_driver
+    ${FREERTOS_DIR}/include
+    ${FREERTOS_DIR}/portable/GCC/ARM_CM4F
+    ${FREERTOS_DIR}
+)
+target_link_libraries(freertosdemo PRIVATE fanctrl crc log)
+target_link_options(freertosdemo PRIVATE
+    ${MCU_FLAGS}
+    -T${LINKER_SCRIPT}
+    -Wl,--gc-sections
+    -Wl,-Map=${CMAKE_BINARY_DIR}/freertosdemo.map
+    -Wl,--no-warn-rwx-segments
+)
+
+add_custom_command(TARGET freertosdemo POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O ihex   $<TARGET_FILE:freertosdemo> ${CMAKE_BINARY_DIR}/freertosdemo.hex
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:freertosdemo> ${CMAKE_BINARY_DIR}/freertosdemo.bin
+    COMMAND ${CMAKE_SIZE}    $<TARGET_FILE:freertosdemo>
+    COMMENT "Generating FreeRTOS hex/bin and print size"
+)

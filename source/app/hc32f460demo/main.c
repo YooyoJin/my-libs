@@ -36,7 +36,8 @@ int main(void)
 {
     SystemInitAll();
     LOG_INFO("SystemCoreClock: %uHz", SystemCoreClock);
-    LOG_INFO("->APP");
+    LOG_INFO("->APP V0.1");
+    // V0.1 修改timer架构
 
     while (1)
     {
