@@ -26,4 +26,13 @@
         "**/Listings/**": true,
         "**/*.md": true,  // 排除所有md
     },
+
+    // clangd负责代码分析(读gcc生成的compile_commands.json), ms-cpp仅做头文件关联
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}/projects/armgcc/build",
+        "--background-index",
+        "--header-insertion=never"
+    ],
+
 }

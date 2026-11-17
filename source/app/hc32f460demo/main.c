@@ -36,8 +36,9 @@ int main(void)
 {
     SystemInitAll();
     LOG_INFO("SystemCoreClock: %uHz", SystemCoreClock);
-    LOG_INFO("->APP V0.1");
-    // V0.1 修改timer架构
+    LOG_INFO("->App v0.1.1");
+    // v0.1.0 修改时间片轮询，Timer架构
+    // v0.1.1 修改中断向量表地址，偏移0x4000，解决ICG编译报错问题
 
     while (1)
     {

@@ -42,6 +42,7 @@ void vApplicationMallocFailedHook(void)
 // 静态任务句柄
 static TaskHandle_t s_xTaskLED;
 static TaskHandle_t s_xTaskLog;
+static TaskHandle_t s_xTaskTaskHealth;
 
 /**
  * @brief  LED任务: 每秒翻转LED+打印计数
@@ -74,6 +75,19 @@ static void TaskLog(void *pvParameters)
     }
 }
 
+static void TaskHealth(void *pvParameters)
+{
+    (void)pvParameters;
+    while (1) {
+        LOG_INFO("[HEALTH] heap=%u, minStackLED=%u, minStackLog=%u, minStackThis=%u",
+                 xPortGetFreeHeapSize(),                   // 剩余堆的大小
+                 uxTaskGetStackHighWaterMark(s_xTaskLED),  // LED任务的栈情况
+                 uxTaskGetStackHighWaterMark(s_xTaskLog),  // LED任务的栈情况
+                 uxTaskGetStackHighWaterMark(NULL));       // 当前HEALTH任务的栈情况
+        vTaskDelay(pdMS_TO_TICKS(5000));
+    }
+}
+
 /**
  * @brief  应用入口(FreeRTOS版)
  */
@@ -89,8 +103,9 @@ int main(void)
     LOG_INFO("FreeRTOS demo start");
 
     // 创建任务
-    xTaskCreate(TaskLED,  "LED",  256, NULL, 2, &s_xTaskLED);
+    xTaskCreate(TaskLED,  "LED",  128, NULL, 2, &s_xTaskLED);
     xTaskCreate(TaskLog,  "LOG",  256, NULL, 1, &s_xTaskLog);
+    xTaskCreate(TaskHealth,  "HEALTH",  256, NULL, 1, &s_xTaskTaskHealth);
 
     // 启动调度器(永不返回)
     LOG_INFO("Starting scheduler...");

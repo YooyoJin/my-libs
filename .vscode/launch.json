@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Cortex Debug (JLink)",
+            "name": "hc32f460demo Cortex Debug (JLink)",
             "type": "cortex-debug",
             "request": "launch",
             "servertype": "jlink",
@@ -10,6 +10,20 @@
             "interface": "swd",
             "cwd": "${workspaceRoot}/projects/armgcc/build",
             "executable": "hc32f460demo.elf",
+            "runToEntryPoint": "main",
+            "preLaunchTask": "build",
+            "serverArgs": ["-speed", "500"],
+            "gdbPath": "E:/Program Files/arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi/bin/arm-none-eabi-gdb.exe"
+        },
+        {
+            "name": "freertosdemo Cortex Debug (JLink)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "device": "HC32F460xE", // 按实际芯片型号填写
+            "interface": "swd",
+            "cwd": "${workspaceRoot}/projects/armgcc/build",
+            "executable": "freertosdemo.elf",
             "runToEntryPoint": "main",
             "preLaunchTask": "build",
             "serverArgs": ["-speed", "500"],

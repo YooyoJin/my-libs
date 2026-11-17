@@ -22,11 +22,12 @@ __OTP_DATA_SIZE  = 64;
 __OTP_LOCK_START = 0x03000FC0;
 __OTP_LOCK_SIZE  = 4;
 
+/* FLASH       (rx): ORIGIN = 0x00000000, LENGTH = 512K */
+/* FLASH       (rx): ORIGIN = 0x00004000, LENGTH = 496K */
 /* Use contiguous memory regions for simple. */
 MEMORY
 {
-    /* FLASH       (rx): ORIGIN = 0x00004000, LENGTH = 496K    //512K - 16K */
-    FLASH       (rx): ORIGIN = 0x00000000, LENGTH = 512K
+    FLASH       (rx): ORIGIN = 0x00004000, LENGTH = 496K  /* 512K - 16K */
     OTP_DATA    (rx): ORIGIN = __OTP_DATA_START, LENGTH = __OTP_DATA_SIZE
     OTP_LOCK    (rx): ORIGIN = __OTP_LOCK_START, LENGTH = __OTP_LOCK_SIZE
     RAM        (rwx): ORIGIN = 0x1FFF8000, LENGTH = 188K
@@ -42,11 +43,6 @@ SECTIONS
         . = ALIGN(4);
         KEEP(*(.vectors))
         . = ALIGN(4);
-    } >FLASH
-
-    .icg_sec 0x00000400 :
-    {
-        KEEP(*(.icg_sec))
     } >FLASH
 
     .text :
