@@ -1,6 +1,6 @@
 /**
  *******************************************************************************
- * @file  bsp_board_type.h
+ * @file  bsppinmap.h
  * @brief This file contains the BSP layer board pin definition types.
  @verbatim
    Change Logs:
@@ -9,8 +9,8 @@
  @endverbatim
  *******************************************************************************
  */
-#ifndef __BSP_BOARD_TYPE_H__
-#define __BSP_BOARD_TYPE_H__
+#ifndef __BSP_PINMAP_H__
+#define __BSP_PINMAP_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -201,4 +201,4 @@ typedef struct {
 }
 #endif
 
-#endif /* __BSP_BOARD_TYPE_H__ */
+#endif /* __BSP_PINMAP_H__ */

@@ -5,7 +5,7 @@
  */
 #include "bspled.h"
 #include "bspdelay.h"
-#include "bspboardtype.h"
+#include "bsppinmap.h"
 #include "hc32_ll_gpio.h"
 #include "log.h"
 
@@ -52,7 +52,7 @@ void BspLedBlinking(uint8_t u8Times)
     BspLedOff();
     while (u8Times--)
     {
-        LOG_DEBUG("Heart beats, %u", u32Count++);
+        // LOG_DEBUG("Heart beats, %u", u32Count++);
         BspLedToggle();
         BspDelayMs(500);
         BspLedToggle();

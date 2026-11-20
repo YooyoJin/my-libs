@@ -21,12 +21,13 @@ static void SystemInitAll(void)
 {
     LL_PERIPH_WE(LL_PERIPH_ALL);  // 解锁外写保护
 
-    RttLogInit();                 // log模块+RTT后端
-    BspClkInit();                 // 时钟(200MHz)
-    BspLedInit();                 // LED
-    AppTimerInit();               // 时间片调度(内部初始化SysTick)
+    RttLogInit();    // log模块+RTT后端
+    BspClkInit();    // 时钟(200MHz)
+    BspLedInit();    // LED
+    AppTimerInit();  // 时间片调度(内部初始化SysTick)
 
     LL_PERIPH_WP(LL_PERIPH_ALL);  // 重新上写保护
+    __enable_irq();               // 使能Boot关闭的全局中断
 }
 
 /**
@@ -42,7 +43,7 @@ int main(void)
 
     while (1)
     {
-        BspLedBlinking(1);   // 心跳+阻塞延时
+        // BspLedBlinking(1);   // 心跳+阻塞延时
         AppTimerTaskRun();   // 时间片任务
     }
 }
